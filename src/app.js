@@ -18,4 +18,10 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
 
+// routes importing
+import userRouter from "./routes/user.routes.js";
+
+// route declearation
+app.use("/api/v1/users", userRouter);
+
 export default app;
