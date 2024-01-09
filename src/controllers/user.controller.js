@@ -1,7 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError..js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { isValidEmail } from "../utils/utils.js";
+import { generateAccessAndRefreshToken, isValidEmail } from "../utils/utils.js";
 import { User } from "../models/user.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 
@@ -75,4 +75,85 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User Registered Successfully!"));
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  // get user details from user -> req.body
+  const { username, email, password } = req.body;
+
+  // check for username/email
+  if (!(username || email)) {
+    throw new ApiError(400, "username or email is required");
+  }
+
+  // check if user exists in db
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User does not exist");
+  }
+
+  // validate passowrd
+  const isPasswordValid = await user.isPasswordValid(password);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "invalid password");
+  }
+
+  // generate and access and refresh token
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
+
+  // send accessToken and refreshTokens to users cookies
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        },
+        "User logged In successfully"
+      )
+    );
+});
+
+const logoutUser = asyncHandler(async (req, res) => {
+  // find user
+  // clear user data from local storage
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { $set: { refreshToken: null } },
+    {
+      new: true,
+    }
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User logged out"));
+
+  // clear user's accessToken and refreshToken from db
+});
+
+export { registerUser, loginUser, logoutUser };
