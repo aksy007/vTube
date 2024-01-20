@@ -138,7 +138,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   // clear user data from local storage
   await User.findByIdAndUpdate(
     req.user._id,
-    { $set: { refreshToken: null } },
+    { $unset: { refreshToken: 1 } }, // removes filed from document
     {
       new: true,
     }
@@ -177,9 +177,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     if (!user) {
       throw new ApiError(401, "Invalid refresh token");
     }
-
     // validate refresh token
-    if (incomingRefreshToken === user?.refreshToken) {
+    if (incomingRefreshToken !== user?.refreshToken) {
       throw new ApiError(401, "Refresh token expired or used");
     }
 
@@ -208,6 +207,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+  // console.log("first", oldPassword, newPassword, confirmNewPassword);
   const user = await User.findById(req.user?._id);
   const isOldPasswordValid = user.isPasswordValid(oldPassword);
 
@@ -263,9 +264,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
 
   if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing");
-
   const avatar = await uploadOnCloudinary(avatarLocalPath);
-  if (avatar.url) {
+  if (!avatar.url) {
     throw new ApiError(400, "Error while uploading Avatar");
   }
 
@@ -287,11 +287,12 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 const updateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
 
-  if (!coverImageLocalPath)
+  if (!coverImageLocalPath) {
     throw new ApiError(400, "Cover image file is missing");
+  }
 
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-  if (coverImage.url) {
+  if (!coverImage.url) {
     throw new ApiError(400, "Error while uploading Cover Image");
   }
 
@@ -370,7 +371,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
   ]);
 
-  console.log("first Aggregate:", channel);
+  // console.log("first Aggregate:", channel);
   if (!channel.length) {
     throw new ApiError(404, "channel does not exist");
   }

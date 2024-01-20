@@ -33,10 +33,10 @@ userRouter.route("/change-password").post(verifyJWT, changeCurrentPassword);
 userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
 userRouter.route("/update-account").patch(verifyJWT, updateAccountDetails);
 userRouter
-  .route("avatar")
+  .route("/update-avatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 userRouter
-  .route("/cover-image")
+  .route("/update-cover-image")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
