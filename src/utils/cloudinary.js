@@ -24,4 +24,10 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
+export const deleteFile = async(public_id)=>{
+  await cloudinary.api.delete_resources(public_id, 
+  { type: 'upload', resource_type: 'auto' })
+
+}
+
 export default uploadOnCloudinary;

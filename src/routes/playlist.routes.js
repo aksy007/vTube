@@ -22,9 +22,9 @@ playlistRouter
   .patch(updatePlaylist)
   .delete(deletePlaylist);
 
-playlistRouter.route("/add/:videoId/:playlistId").patch(addVideoToPlaylist);
+playlistRouter.route("/add/:playlistId/:videoId/").patch(addVideoToPlaylist);
 playlistRouter
-  .route("/remove/:videoId/:playlistId")
+  .route("/remove/:playlistId/:videoId")
   .patch(removeVideoFromPlaylist);
 
 playlistRouter.route("/user/:userId").get(getUserPlaylists);
