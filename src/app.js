@@ -29,11 +29,11 @@ import subscriptionRouter from "./routes/subscription.routes.js";
 
 // route declearation
 app.use("/api/v1/users", userRouter);
-app.use("/app/v1/likes", likeRouter);
-app.use("/app/v1/videos", videoRouter);
-app.use("/app/v1/comment", commentRouter);
-app.use("/app/v1/tweets", tweetRouter);
-app.use("/app/v1/playlist", playlistRouter);
-app.use("/app/v1/subscriptions", subscriptionRouter);
+app.use("/api/v1/likes", likeRouter);
+app.use("/api/v1/videos", videoRouter);
+app.use("/api/v1/comment", commentRouter);
+app.use("/api/v1/tweets", tweetRouter);
+app.use("/api/v1/playlist", playlistRouter);
+app.use("/api/v1/subscriptions", subscriptionRouter);
 
 export default app;
