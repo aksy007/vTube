@@ -9,9 +9,9 @@ const toggleSubscription = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
   
   if(!channelId) {
-    throw new ApiError(400, "ChannelId is required");
+    throw new ApiError(400, "Channel Id is required");
   }
-
+  
   const subscriber = { subscriber: req.user._id, channel: channelId };
   
   try {
@@ -47,16 +47,16 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-  const { subscriberId } = req.params;
-  if(!subscriberId){
-    throw new ApiError(400,"subscriebr Id is Requitred")
+  const { channelId } = req.params;
+  if(!channelId){
+    throw new ApiError(400,"channel Id is Requitred")
   }
 
   try {
     const subscribers = await Subscription.aggregate([
       {
         $match: {
-          channel: new mongoose.Types.ObjectId(subscriberId)
+          channel: new mongoose.Types.ObjectId(channelId)
         }
       },
       {
@@ -94,16 +94,16 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-  const { subscriberId } = req.params;
-  if(!subscriberId){
-    throw new ApiError(400,"subscriebr Id is Requitred")
+  const { channelId } = req.params;
+  if(!channelId){
+    throw new ApiError(400,"channel Id is Requitred")
   }
 
   try {
     const subscriberList = await Subscription.aggregate([
       {
         $match: {
-          subscriber: new mongoose.Types.ObjectId(subscriberId)
+          subscriber: new mongoose.Types.ObjectId(channelId)
         }
       },
       {
