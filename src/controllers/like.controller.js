@@ -29,7 +29,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   return res
           .status(200)
           .json(
-            new ApiResponse(200, {unlikeVideo}, "Video Liked")
+            new ApiResponse(200, { unlikeVideo }, "Video Unliked")
           );
 });
 
@@ -37,7 +37,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
 
   const likeStatus = { likedBy: req.user?._id, comment: commentId };
-  const isCommentLiked = await Like.findOne(commentId);
+  const isCommentLiked = await Like.findOne(likeStatus);
 
   if(!isCommentLiked) {
     const likeComment = await Like.create(likeStatus);
@@ -65,16 +65,14 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
-
   const likeStatus = { likedBy: req.user?._id, comment: tweetId };
-  const isTweetLiked = await Like.findOne(commentId);
-
+  const isTweetLiked = await Like.findOne(likeStatus);
   if(!isTweetLiked) {
     const likeTweet = await Like.create(likeStatus);
     if(!likeTweet) {
       throw new ApiError(500, "Something went wrong");
     }
-
+    console.log("first", isTweetLiked, "\n\n\n")
     return res
           .status(200)
           .json(
@@ -89,7 +87,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   return res
         .status(200)
         .json(
-          new ApiResponse(200, {unLikeTweet}, "Comment unliked successfully")
+          new ApiResponse(200, {unLikeTweet}, "Tweet unliked successfully")
         );
 });
 
@@ -106,7 +104,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     return res
           .status(200)
           .json(
-            new ApiResponse(200, { likedVideos }, "Fetched all vidoes")
+            new ApiResponse(200, { likedVideos }, "Fetched all liked vidoes")
           );
 });
 

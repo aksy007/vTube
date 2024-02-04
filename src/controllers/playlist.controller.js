@@ -41,7 +41,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: 'videos',
-        localfield: "videos",
+        localField: "videos",
         foreignField: '_id',
         as: 'videos',
         pipeline: [
@@ -171,7 +171,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
   return res
         .status(200)
         .json(
-          new ApiResponse(200, "Playlist fetched successfully")
+          new ApiResponse(200, userPlaylist, "Playlist fetched successfully")
         );
 });
 
@@ -193,7 +193,11 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
   }
 
   if(userPlaylist.videos.includes(videoId)) {
-    throw new ApiError(400, "Video is already present in playlist");
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(200, "", "Video already present in Playlist")
+    );
   }
 
   const addVideoToPlaylist = await Playlist.findByIdAndUpdate(playlistId, {
@@ -206,7 +210,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
   return res
         .status(201)
         .json(
-          new ApiResponse(201, {}, "Video added to playlist successfullly")
+          new ApiResponse(201, "", "Video added to playlist successfullly")
         );
 });
 
@@ -229,7 +233,11 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
   }
 
   if(!userPlaylist.videos.includes(videoId)) {
-    throw new ApiError(404, "Video is not present in playlist");
+    return res
+        .status(201)
+        .json(
+          new ApiResponse(201, "", "Video not present in playlist")
+        );
   }
 
   const removeVideoFromPlaylist = await Playlist.findByIdAndUpdate(
